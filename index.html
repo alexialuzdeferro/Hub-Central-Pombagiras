@@ -359,6 +359,48 @@
       color: rgba(255, 255, 255, 0.6);
     }
 
+    .visitor-counter {
+      margin-bottom: 25px;
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(139, 0, 0, 0.3), rgba(75, 0, 130, 0.2));
+      border-radius: 15px;
+      border: 1px solid rgba(255, 0, 68, 0.3);
+      backdrop-filter: blur(10px);
+      max-width: 400px;
+      margin: 0 auto 25px;
+    }
+
+    .counter-label {
+      font-size: 1rem;
+      color: #ffd700;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .counter-number {
+      font-family: 'Cinzel', serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #ff0040;
+      text-shadow: 0 0 20px rgba(255, 0, 68, 0.8);
+      animation: counterGlow 2s ease-in-out infinite;
+    }
+
+    .counter-number .loading {
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    @keyframes counterGlow {
+      0%, 100% { 
+        text-shadow: 0 0 20px rgba(255, 0, 68, 0.8), 0 0 40px rgba(255, 0, 68, 0.4);
+      }
+      50% { 
+        text-shadow: 0 0 30px rgba(255, 0, 68, 1), 0 0 60px rgba(255, 0, 68, 0.6);
+      }
+    }
+
     @media (max-width: 768px) {
       .links-grid {
         grid-template-columns: 1fr;
@@ -550,7 +592,13 @@
     </main>
 
     <footer class="footer">
-      <p>🌹 Almas de Pombagira • Onde o Fogo encontra a Rosa 🔥</p>
+      <div class="visitor-counter">
+        <div class="counter-label">✨ Almas que passaram por aqui ✨</div>
+        <div class="counter-number" id="visitorCount">
+          <span class="loading">Carregando...</span>
+        </div>
+      </div>
+      <p style="margin-top: 20px;">🌹 Almas de Pombagira • Onde o Fogo encontra a Rosa 🔥</p>
     </footer>
   </div>
 
@@ -584,9 +632,56 @@
       }
     }
 
+    // Contador de visitantes
+    async function updateVisitorCount() {
+      const counterElement = document.getElementById('visitorCount');
+      
+      try {
+        // Buscar contador atual
+        let count = 1;
+        try {
+          const result = await window.storage.get('pombagira_visitor_count', true);
+          if (result && result.value) {
+            count = parseInt(result.value) + 1;
+          }
+        } catch (e) {
+          // Primeira visita - chave não existe ainda
+          count = 1;
+        }
+
+        // Salvar novo contador
+        await window.storage.set('pombagira_visitor_count', count.toString(), true);
+        
+        // Animar a contagem
+        let current = Math.max(0, count - 20);
+        const target = count;
+        const duration = 2000;
+        const steps = 50;
+        const increment = (target - current) / steps;
+        const stepTime = duration / steps;
+        
+        const animate = () => {
+          current += increment;
+          if (current < target) {
+            counterElement.textContent = Math.floor(current).toLocaleString('pt-BR');
+            setTimeout(animate, stepTime);
+          } else {
+            counterElement.textContent = target.toLocaleString('pt-BR');
+          }
+        };
+        
+        animate();
+        
+      } catch (error) {
+        console.error('Erro ao atualizar contador:', error);
+        counterElement.innerHTML = '<span class="loading">🌹 ∞ 🔥</span>';
+      }
+    }
+
     // Inicializar efeitos
     createParticles();
     createFlames();
+    updateVisitorCount();
 
     // Efeito parallax suave no mouse
     document.addEventListener('mousemove', (e) => {
