@@ -24,7 +24,7 @@ Tudo reunido em um único site, com forte identidade visual e narrativa espiritu
 ## 🌐 Acesso ao Portal
 
 👉 **Link oficial (GitHub Pages):**  
-https://alexialuzdeferro.github.io/almas-de-pombagira/
+https://alexialuzdeferro.github.io/Hub-Central-Pombagiras/
 
 *(ajuste conforme o nome real do repositório)*
 
